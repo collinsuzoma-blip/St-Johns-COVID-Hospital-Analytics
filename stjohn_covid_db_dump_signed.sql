@@ -1,26 +1,14 @@
--- ============================================================
--- Programmer Anasieze Uzoma
--- PostgreSQL DATABASE DUMP (Portable)
--- Database: stjohns_covid_hospital
--- Purpose: Portfolio case study (COVID-19 operations analytics)
--- How to restore:
---   psql -f stjohns_covid_db_dump.sql
--- ============================================================
+--COVID-19 HOSPITAL ANALYTICS (PostgreSQL)
 
 CREATE DATABASE stjohns_covid_hospital;
 \connect stjohns_covid_hospital;
 
 -- ==========================================
--- COVID-19 HOSPITAL ANALYTICS (PostgreSQL)
--- St. John's, Newfoundland - Portfolio Case Study
--- Synthetic (fictional) operational data (no patient identifiers)
--- ==========================================
-
 BEGIN;
 
--- ----------------------------
--- 0) Drop objects (so script reruns)
--- ----------------------------
+------------------------------
+--Drop objects (so script reruns)
+------------------------------
 DROP VIEW IF EXISTS vw_exec_summary CASCADE;
 DROP VIEW IF EXISTS vw_positivity_trend CASCADE;
 DROP VIEW IF EXISTS vw_admissions_icu_trend CASCADE;
@@ -33,9 +21,9 @@ DROP TABLE IF EXISTS fact_covid_daily CASCADE;
 DROP TABLE IF EXISTS dim_hospital_unit CASCADE;
 DROP TABLE IF EXISTS dim_date CASCADE;
 
--- ----------------------------
--- 1) Dimensions
--- ----------------------------
+------------------------------
+--Dimensions
+------------------------------
 CREATE TABLE dim_date (
   d DATE PRIMARY KEY,
   year INT NOT NULL,
@@ -49,9 +37,9 @@ CREATE TABLE dim_hospital_unit (
   unit_name TEXT NOT NULL UNIQUE CHECK (unit_name IN ('ED','Med','ICU'))
 );
 
--- ----------------------------
--- 2) Facts (daily)
--- ----------------------------
+------------------------------
+--Facts (daily)
+------------------------------
 CREATE TABLE fact_covid_daily (
   d DATE NOT NULL REFERENCES dim_date(d),
   unit_id INT NOT NULL REFERENCES dim_hospital_unit(unit_id),
@@ -96,9 +84,9 @@ CREATE TABLE fact_staffing_daily (
   CHECK (staff_available <= staff_scheduled)
 );
 
--- ----------------------------
--- 3) Seed dimensions
--- ----------------------------
+------------------------------
+--Seed dimensions
+------------------------------
 INSERT INTO dim_hospital_unit (unit_name) VALUES ('ED'), ('Med'), ('ICU');
 
 -- Daily calendar: 2020-03-01 to 2022-12-31
@@ -111,11 +99,9 @@ SELECT
   EXTRACT(WEEK FROM gs)::int
 FROM generate_series('2020-03-01'::date, '2022-12-31'::date, interval '1 day') gs;
 
--- ----------------------------
--- 4) Synthetic COVID operations data
---    - Creates wave-like patterns (seasonal + noise)
---    - Higher severity and LOS in ICU
--- ----------------------------
+------------------------------
+--Synthetic COVID operations data
+------------------------------
 
 WITH base AS (
   SELECT
@@ -265,9 +251,9 @@ SELECT
   GREATEST(0, (0 + (occ_rate*5) + random()*2)::int) AS sick_calls
 FROM s;
 
--- ----------------------------
--- 5) Views (dashboard-ready)
--- ----------------------------
+------------------------------
+--Views (dashboard ready)
+------------------------------
 
 CREATE VIEW vw_exec_summary AS
 SELECT
