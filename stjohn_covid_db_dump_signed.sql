@@ -3,7 +3,7 @@
 CREATE DATABASE stjohns_covid_hospital;
 \connect stjohns_covid_hospital;
 
--- ==========================================
+==========================================
 BEGIN;
 
 ------------------------------
@@ -89,7 +89,7 @@ CREATE TABLE fact_staffing_daily (
 ------------------------------
 INSERT INTO dim_hospital_unit (unit_name) VALUES ('ED'), ('Med'), ('ICU');
 
--- Daily calendar: 2020-03-01 to 2022-12-31
+--Daily calendar: 2020-03-01 to 2022-12-31
 INSERT INTO dim_date (d, year, month, day, week)
 SELECT
   gs::date AS d,
@@ -183,7 +183,7 @@ SELECT
   icu_admissions, ventilated_patients, deaths, avg_los_days
 FROM final;
 
--- Capacity: fixed bed availability by unit; occupancy reacts to admissions (proxy pressure)
+--Capacity: fixed bed availability by unit; occupancy reacts to admissions (proxy pressure)
 WITH cap AS (
   SELECT
     cd.d,
@@ -217,7 +217,7 @@ SELECT
   ) AS beds_occupied
 FROM cap;
 
--- Staffing: scheduled vs available; sick calls increase as occupancy rises
+--Staffing: scheduled vs available; sick calls increase as occupancy rises
 WITH staff_base AS (
   SELECT
     c.d,
